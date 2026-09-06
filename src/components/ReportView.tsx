@@ -28,18 +28,18 @@ interface ReportViewProps {
 }
 
 export const ReportView: React.FC<ReportViewProps> = ({
-  students,
+  students = [],
   degree,
   problem,
-  procedures,
-  warnings,
+  procedures = [],
+  warnings = [],
   isSaved,
   onSaveToArchive,
   onOpenWhatsApp,
   onShowAlert
 }) => {
   const [checkedProcs, setCheckedProcs] = useState<boolean[]>(() =>
-    procedures.map(() => true)
+    (procedures || []).map(() => true)
   );
 
   const toggleProc = (index: number) => {
@@ -198,6 +198,341 @@ export const ReportView: React.FC<ReportViewProps> = ({
     a.download = `تقرير_سلوكي_${fileName}.doc`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const generatePrintableHTML = () => {
+    const stdNames = students
+      .map((s) => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:5px;">
+          <div><strong>${s.name}</strong> <span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:4px; font-size:11px; margin-right:6px; font-weight:600;">${s.cls}</span></div>
+          <div style="direction:ltr; font-family:monospace; font-size:12px; color:#334155; font-weight:bold;">${formatPhoneDisplay(s.phone)}</div>
+        </div>
+      `)
+      .join('');
+
+    let proceduresRows = '';
+    procedures.forEach((proc, index) => {
+      const isChecked = checkedProcs[index];
+      const checkSymbol = isChecked ? '&#9745;' : '&#9744;';
+      const checkColor = isChecked ? '#16a085' : '#94a3b8';
+      const rowBg = isChecked ? '#f0fdf4' : (index % 2 === 0 ? '#ffffff' : '#f8fafc');
+      proceduresRows += `
+        <tr style="background-color: ${rowBg};">
+          <td style="border: 1px solid #cbd5e1; text-align: center; vertical-align: middle; padding: 8px; font-size: 16px; color: ${checkColor}; font-weight: bold;">${checkSymbol}</td>
+          <td style="border: 1px solid #cbd5e1; text-align: center; padding: 8px; font-weight: bold; color: #16a085;">الإجراء ${index + 1}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 8px 12px; color: #1e293b; line-height: 1.6;">${proc}</td>
+        </tr>
+      `;
+    });
+
+    return `<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="utf-8">
+  <title>تقرير دراسة حالة ومخالفة سلوكية - مدرسة الجشة المتوسطة</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+      direction: rtl;
+      background: #ffffff;
+      color: #1e293b;
+      padding: 24px;
+      font-size: 13px;
+      line-height: 1.5;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    @page {
+      size: A4 portrait;
+      margin: 12mm 12mm 15mm 12mm;
+    }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none !important; }
+      tr { page-break-inside: avoid; }
+    }
+    .top-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      padding: 12px 20px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .btn-print {
+      background: #16a085;
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .btn-close {
+      background: #64748b;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      font-weight: 600;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .header-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #16a085;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+    .school-info {
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 1.6;
+      color: #334155;
+      text-align: right;
+    }
+    .title-box {
+      text-align: center;
+    }
+    .title-box h1 {
+      font-size: 18px;
+      color: #16a085;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .title-box span {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+    }
+    .date-box {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: bold;
+      text-align: left;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    th {
+      background-color: #f1f5f9;
+      color: #16a085;
+      font-weight: 700;
+    }
+    .section-title {
+      font-size: 12px;
+      font-weight: bold;
+      color: #16a085;
+      margin: 16px 0 8px 0;
+      border-bottom: 1px dashed #cbd5e1;
+      padding-bottom: 4px;
+    }
+    .signatures {
+      display: flex;
+      justify-content: space-between;
+      text-align: center;
+      margin-top: 35px;
+      padding-top: 10px;
+    }
+    .sig-block {
+      width: 30%;
+      font-size: 12px;
+      font-weight: bold;
+      color: #334155;
+    }
+    .sig-title {
+      color: #16a085;
+      margin-bottom: 25px;
+    }
+    .sig-dots {
+      color: #94a3b8;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-actions no-print">
+    <button class="btn-print" onclick="window.print()">🖨️ طباعة التقرير الآن (Ctrl + P)</button>
+    <button class="btn-close" onclick="window.close()">✖ إغلاق النافذة</button>
+  </div>
+
+  <div class="header-box">
+    <div class="school-info">
+      المملكة العربية السعودية<br>
+      وزارة التعليم<br>
+      إدارة التعليم بمحافظة الأحساء<br>
+      مدرسة الجشة المتوسطة
+    </div>
+    <div class="title-box">
+      <h1>تقرير معالجة مشكلة سلوكية</h1>
+      <span>وفق قواعد السلوك والمواظبة المعتمدة</span>
+    </div>
+    <div class="date-box">
+      التاريخ: ${todayStr}
+    </div>
+  </div>
+
+  <table>
+    <tbody>
+      <tr>
+        <th style="width: 25%; text-align: right;">بيانات الطلاب وأولياء الأمور</th>
+        <td>${stdNames}</td>
+      </tr>
+      <tr>
+        <th style="text-align: right;">الصف الدراسي</th>
+        <td><strong>${distinctClasses}</strong></td>
+      </tr>
+      <tr>
+        <th style="text-align: right;">وصف الموقف (المشكلة السلوكية)</th>
+        <td style="white-space: pre-line; line-height: 1.6;">${problem}</td>
+      </tr>
+      <tr>
+        <th style="background-color: #fee2e2; color: #991b1b; text-align: right;">درجة المخالفة</th>
+        <td style="background-color: #fef2f2; color: #b91c1c; font-weight: 800; font-size: 13px;">${degree}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">
+    الإجراءات التربوية والعلاجية المحددة للجميع:
+  </div>
+
+  <table>
+    <thead>
+      <tr style="background-color: #e2e8f0; color: #16a085;">
+        <th style="width: 50px; text-align: center;">المنفذ</th>
+        <th style="width: 90px; text-align: center;">الإجراء</th>
+        <th style="text-align: right;">وصف الإجراء التفصيلي</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${proceduresRows}
+    </tbody>
+  </table>
+
+  <div class="signatures">
+    <div class="sig-block">
+      <div class="sig-title">توقيع الطلاب المعنيين</div>
+      <div class="sig-dots">...................................</div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-title">توقيع وكيل المدرسة</div>
+      <div class="sig-dots">...................................</div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-title">توقيع مدير المدرسة</div>
+      <div class="sig-dots">...................................</div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        window.focus();
+        window.print();
+      }, 350);
+    });
+  </script>
+</body>
+</html>`;
+  };
+
+  const handlePrint = () => {
+    const printableHTML = generatePrintableHTML();
+
+    // Strategy 1: Open clean print tab/window (bypasses iframe sandbox, allows native print dialog)
+    let printWindow: Window | null = null;
+    try {
+      printWindow = window.open('', '_blank');
+    } catch (err) {
+      console.warn('window.open blocked:', err);
+    }
+
+    if (printWindow) {
+      try {
+        printWindow.document.open();
+        printWindow.document.write(printableHTML);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+          try {
+            printWindow?.print();
+          } catch {
+            // inside printWindow the script will also handle it
+          }
+        }, 400);
+        return;
+      } catch (err) {
+        console.warn('Failed writing to print window:', err);
+      }
+    }
+
+    // Strategy 2: Hidden iframe on current page
+    try {
+      let iframe = document.getElementById('report-print-frame') as HTMLIFrameElement | null;
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'report-print-frame';
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        iframe.style.visibility = 'hidden';
+        document.body.appendChild(iframe);
+      }
+
+      const doc = iframe.contentWindow?.document || iframe.contentDocument;
+      if (doc) {
+        doc.open();
+        doc.write(printableHTML);
+        doc.close();
+
+        setTimeout(() => {
+          try {
+            iframe?.contentWindow?.focus();
+            iframe?.contentWindow?.print();
+          } catch (iframeErr) {
+            console.warn('Iframe print failed:', iframeErr);
+            window.print();
+          }
+        }, 400);
+        return;
+      }
+    } catch (err) {
+      console.warn('Iframe strategy failed:', err);
+    }
+
+    // Strategy 3: Standard window.print() fallback
+    try {
+      window.print();
+    } catch {
+      // Strategy 4: Fallback to PDF export if system print dialog is completely blocked
+      handleExportPDF();
+      onShowAlert('تم تنزيل ملف التقرير كـ PDF لطباعته مباشرة نظراً لقيود المتصفح على أمر الطباعة.');
+    }
   };
 
   const handleWhatsAppClick = () => {
@@ -447,11 +782,12 @@ export const ReportView: React.FC<ReportViewProps> = ({
         </button>
 
         <button
-          onClick={() => window.print()}
-          className="bg-gray-700 hover:bg-gray-800 text-white py-3.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
-          title="طباعة مباشرة"
+          id="btnPrintReport"
+          onClick={handlePrint}
+          className="bg-gray-700 hover:bg-gray-800 text-white py-3.5 px-5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
+          title="طباعة التقرير مباشرة"
         >
-          <Printer className="w-4 h-4" />
+          <Printer className="w-5 h-5" />
           <span>طباعة</span>
         </button>
       </div>

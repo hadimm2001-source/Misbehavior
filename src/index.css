@@ -19,17 +19,31 @@
 }
 
 @media print {
-  body {
+  body, #root {
     background: white !important;
     padding: 0 !important;
+    margin: 0 !important;
   }
-  .no-print {
+  .no-print, header, nav, footer {
     display: none !important;
+  }
+  #report-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
   }
   #report-container {
     border: none !important;
     box-shadow: none !important;
-    padding: 0 !important;
+    padding: 10px 0 !important;
+    margin: 0 !important;
     width: 100% !important;
+    background: white !important;
+  }
+  table, tr, td, th {
+    page-break-inside: avoid !important;
+  }
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm;
   }
 }

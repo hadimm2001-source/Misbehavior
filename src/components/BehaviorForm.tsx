@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ShieldAlert, Plus, Search, X, Check, UserPlus, Phone, BookOpen } from 'lucide-react';
+import { ShieldAlert, Plus, Search, X, Check, UserPlus, Phone } from 'lucide-react';
 import { SelectedStudent, Student, ViolationDegreeType } from '../types.ts';
 import { violationsDatabase } from '../data/violations.ts';
 import { formatPhoneDisplay } from '../utils/phoneUtils.ts';
@@ -17,19 +17,17 @@ interface BehaviorFormProps {
   ) => void;
   onShowAlert: (message: string) => void;
   onOpenAddStudent: () => void;
-  onOpenDirectory?: () => void;
 }
 
 export const BehaviorForm: React.FC<BehaviorFormProps> = ({
-  studentsData,
+  studentsData = [],
   classMap,
-  selectedStudents,
+  selectedStudents = [],
   onAddStudent,
   onRemoveStudent,
   onGenerateReport,
   onShowAlert,
-  onOpenAddStudent,
-  onOpenDirectory
+  onOpenAddStudent
 }) => {
   const [selectedClassNorm, setSelectedClassNorm] = useState<string>('');
   const [selectedStudentName, setSelectedStudentName] = useState<string>('');
@@ -55,7 +53,7 @@ export const BehaviorForm: React.FC<BehaviorFormProps> = ({
       setSelectedStudentName('');
       return;
     }
-    const filtered = studentsData
+    const filtered = (studentsData || [])
       .filter((s) => s.normalizedClass === selectedClassNorm)
       .sort((a, b) => a.name.localeCompare(b.name));
     setAvailableStudents(filtered);
@@ -210,27 +208,14 @@ export const BehaviorForm: React.FC<BehaviorFormProps> = ({
               <label className="font-bold text-[#27ae60] text-xs md:text-sm">
                 2. اختر اسم الطالب وأضفه للقائمة:
               </label>
-              <div className="flex items-center gap-2">
-                {onOpenDirectory && (
-                  <button
-                    type="button"
-                    onClick={onOpenDirectory}
-                    className="text-[11px] text-emerald-700 hover:text-emerald-900 font-bold flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 cursor-pointer"
-                    title="استعراض والبحث في دليل أرقام جوالات الطلاب وأولياء الأمور"
-                  >
-                    <BookOpen className="w-3 h-3 text-emerald-600" />
-                    <span>دليل الهواتف</span>
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={onOpenAddStudent}
-                  className="text-[11px] text-[#16a085] hover:underline font-bold flex items-center gap-1 cursor-pointer"
-                >
-                  <UserPlus className="w-3 h-3" />
-                  <span>طالب جديد؟</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={onOpenAddStudent}
+                className="text-[11px] text-[#16a085] hover:underline font-bold flex items-center gap-1 cursor-pointer"
+              >
+                <UserPlus className="w-3 h-3" />
+                <span>طالب جديد؟ أضفه هنا</span>
+              </button>
             </div>
             <div className="flex gap-2">
               <select

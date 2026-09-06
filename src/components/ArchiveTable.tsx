@@ -27,7 +27,7 @@ interface ArchiveTableProps {
 }
 
 export const ArchiveTable: React.FC<ArchiveTableProps> = ({
-  archive,
+  archive = [],
   classMap,
   allStudents = [],
   onViewProcedures,
@@ -37,6 +37,8 @@ export const ArchiveTable: React.FC<ArchiveTableProps> = ({
   const [filterClass, setFilterClass] = useState('الكل');
   const [filterDegree, setFilterDegree] = useState('الكل');
   const [filterCount, setFilterCount] = useState('الكل');
+
+  const safeArchive = archive || [];
 
   const getRecordPhone = (record: ArchiveRecord): string => {
     if (record.phone) return record.phone;
@@ -57,7 +59,7 @@ export const ArchiveTable: React.FC<ArchiveTableProps> = ({
     openWhatsAppChat(phone, message);
   };
 
-  const filteredRecords = archive.filter((record) => {
+  const filteredRecords = safeArchive.filter((record) => {
     const matchName = record.name
       .toLowerCase()
       .includes(filterName.trim().toLowerCase());

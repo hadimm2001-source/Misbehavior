@@ -7,7 +7,6 @@ import { CustomAlertModal } from './components/CustomAlertModal.tsx';
 import { ProceduresModal } from './components/ProceduresModal.tsx';
 import { WhatsAppModal } from './components/WhatsAppModal.tsx';
 import { AddStudentModal } from './components/AddStudentModal.tsx';
-import { StudentDirectoryModal } from './components/StudentDirectoryModal.tsx';
 import { parseStudentsData, normalizeClass } from './data/students.ts';
 import { violationsDatabase } from './data/violations.ts';
 import {
@@ -106,7 +105,6 @@ export default function App() {
   >([]);
 
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
-  const [isDirectoryModalOpen, setIsDirectoryModalOpen] = useState(false);
 
   // Sync state (local storage is always ready and syncing)
   const isSynced = true;
@@ -271,11 +269,7 @@ export default function App() {
     <div className="min-h-screen bg-[#f0fbfc] text-[#2c3e50] p-3 md:p-6 font-['Tajawal']">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <Header
-          isSynced={isSynced}
-          onOpenDirectory={() => setIsDirectoryModalOpen(true)}
-          onOpenAddStudent={() => setIsAddStudentModalOpen(true)}
-        />
+        <Header isSynced={isSynced} />
 
         {/* Behavior Registration Form */}
         <BehaviorForm
@@ -287,7 +281,6 @@ export default function App() {
           onGenerateReport={handleGenerateReport}
           onShowAlert={showAlert}
           onOpenAddStudent={() => setIsAddStudentModalOpen(true)}
-          onOpenDirectory={() => setIsDirectoryModalOpen(true)}
         />
 
         {/* Active Report View (if generated) */}
@@ -349,17 +342,6 @@ export default function App() {
             onClose={() => setIsWhatsAppModalOpen(false)}
           />
         )}
-
-        <StudentDirectoryModal
-          isOpen={isDirectoryModalOpen}
-          onClose={() => setIsDirectoryModalOpen(false)}
-          allStudents={allStudents}
-          classMap={classMap}
-          onOpenAddStudent={() => {
-            setIsDirectoryModalOpen(false);
-            setIsAddStudentModalOpen(true);
-          }}
-        />
       </div>
     </div>
   );
