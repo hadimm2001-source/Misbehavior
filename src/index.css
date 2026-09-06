@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+}
+
+:root {
+  --marine-grass: #16a085;     
+  --green-main: #27ae60;       
+  --bg-color: #f0fbfc;         
+  --card-bg: #ffffff;
+  --text-main: #2c3e50;
+  --border-color: #b2ebf2;
+  --warning-color: #f39c12;
+  --danger-color: #c62828;
+  --pdf-color: #e74c3c;
+}
+
+@media print {
+  body {
+    background: white !important;
+    padding: 0 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  #report-container {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+}

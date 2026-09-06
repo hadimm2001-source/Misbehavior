@@ -1,0 +1,6 @@
+{
+  "name": "نظام معالجة المشكلات السلوكية | مدرسة الجشة",
+  "description": "نظام إلكتروني ذكي لمعالجة وأرشفة المشكلات السلوكية للطلاب بمدرسة الجشة المتوسطة وفق الدليل الإجرائي المعتمد.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
